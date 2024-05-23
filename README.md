@@ -16,7 +16,8 @@ Uma API para gerenciar um sistema de tarefas e projetos, permitindo que usuário
 7. [Outros Endpoints](#outros-endpoints)
 8. [Flake8 e Black](#flake8-e-black)
 9. [Debug](#debug)
-10. [Segurança](#segurança)
+10. [Testes](#testes)
+11. [Segurança](#segurança)
 
 ## Instalação
 
@@ -193,6 +194,13 @@ Para Black:
 ## Debug
 
 Um registro de logs é criado no arquivo `debug.log`.
+
+## Testes
+
+Se a API estiver rodando, testes podem ser realizados para verificação dos serializers, views e models.
+Utilize o comando:
+
+```docker-compose run web python manage.py test core.tests```
 
 ## Segurança
 
