@@ -1,117 +1,109 @@
-# Desafio Backend | Django
+# Task Manager
 
-Olá, candidato! Se você chegou até aqui, é porque demonstrou interesse em fazer parte do nosso time. Preparamos um desafio para entendermos um pouco mais sobre suas habilidades como desenvolvedor backend em Django.
 
-## 🚀 Objetivo:
+Uma API para gerenciar um sistema de tarefas e projetos, permitindo que usuários criem projetos e associem tarefas a eles.
 
-Desenvolver uma API para gerenciar um sistema de tarefas e projetos, permitindo que usuários criem projetos e associem tarefas a eles.
+## Instalação
 
-## 📖 Regras de Negócio:
+```docker build -t task_manager:v1 . ```
 
-1. Somente o criador do projeto pode adicionar ou remover membros.
-2. Tarefas só podem ser criadas por membros do projeto ao qual a tarefa pertence.
-3. Um usuário só pode ser adicionado a um projeto se ele já estiver registrado na plataforma.
-4. Tarefas concluídas não podem ser editadas.
-5. As tarefas precisam ter tags.
+```docker run web python manage.py migrate ```
 
-## 💻 Tecnologias:
+```docker-compose up -d ```
 
-- Django
+## Exemplos de Uso
+Uma vez que a API esteja rodando, deve se acessar a URL `http://127.0.0.1:8000/swagger/` para visualizar a documentação da API.
 
-# Desafio Backend | Django
+## Testes pelo Swagger
 
-Olá, candidato! Se você chegou até aqui, é porque demonstrou interesse em fazer parte do nosso time. Preparamos um desafio para entendermos um pouco mais sobre suas habilidades como desenvolvedor backend em Django.
+### Primeiro Passo
+Deve se criar um usuário na parte de users e depois post /users/. clicando em Try it Out no canto direito superior. 
+Uma opção para editar o JSON irá aparecer e você deve preenche-lo com as informações de seu usuário. como no exemplo:
 
-## 🚀 Objetivo:
+{
+  "username": "usuario",
+  "email": "user@example.com",
+  "password": "123user"
+}
 
-Desenvolver uma API para gerenciar um sistema de tarefas e projetos, permitindo que usuários criem projetos e associem tarefas a eles.
+### Segundo Passo
+Uma vez isso feito, você deve ir até o topo da página do Swagger e clicar em Authorize. Passe o username e o password criado no passo anterior, e você deverá receber o token JWT para acessar os outros recursos da API.
 
-## 📖 Regras de Negócio:
+## Criando Projetos
+Ainda no Swagger, após ter logado e recebido o token JWT. Você deve ir até a parte de projects, POST /projects/.
+Clicando em Try It Out novamente, deve aparecer uma caixa para editar o JSON.
 
-1. Somente o criador do projeto pode adicionar ou remover membros.
-2. Tarefas só podem ser criadas por membros do projeto ao qual a tarefa pertence.
-3. Um usuário só pode ser adicionado a um projeto se ele já estiver registrado na plataforma.
-4. Tarefas concluídas não podem ser editadas.
-5. As tarefas precisam ter tags.
+Exemplo:
+{
+  "name": "Projeto Teste",
+  "description": "Este é apenas um teste de criação de projeto",
+  "members": [
+    1
+  ]
+}
 
-## 💻 Tecnologias:
+Ao clicar em Execute. Um novo projeto deve ser criado com o usuário criado no passo anterior como membro desse projeto.
 
-- Django
-- PostgreSQL
-- Django REST framework
-- Django ORM
+No Json members recebe uma lista de ids dos usuários que devem ser adicionados ao projeto.
 
-## 📜 Requisitos:
+PS: Se um novo usuário for criado, e tentar adicionar membros a esse projeto no PATCH/POST /projects/{id}/
+Ele deve receber um erro:
+"Apenas o criador do projeto pode adicionar ou remover membros."
 
-### 1. Configuração Inicial:
+A mesma coisa deve acontecer caso se tente excluir o projeto utilizando o login de outro usuário que não seja o criador do projeto. Apenas o criador do projeto pode adicionar ou remover membros, e deletar o projeto.
 
-- Configurar um projeto usando Django.
-- Configurar um banco de dados PostgreSQL (Local).
-- Utilizar o Django ORM.
+## Criando Tags
 
-### 2. Modelo de Dados:
+Importante! As Tags devem ser criadas ANTES das tarefas, caso contrário as tarefas não serão criadas, pois todas as tarefas precisam ser associadas a uma tag.
 
-#### Usuário (`User`):
+Ainda logado com seu usuário, vá até tags, em seguida POST /tags/. Clicando em Try It Out novamente, deve aparecer uma caixa para editar o JSON.
 
-- ID: ID gerado automaticamente.
-- Nome: Texto.
-- Email: Texto, único.
-- Senha: Texto, encriptada.
+Exemplo:
 
-#### Projeto (`Project`):
+{
+  "title": "Homologação"
+}
 
-- ID: ID gerado automaticamente.
-- Nome: Texto.
-- Descrição: Texto.
-- Membros: Lista de usuários associados ao projeto.
+Ao clicar em Execute. Uma nova tag deve ser criada.
 
-#### Tarefa (`Task`):
+## Criando Tarefas
 
-- ID: ID gerado automaticamente.
-- Título: Texto, máximo de 255 caracteres.
-- Descrição: Texto.
-- Data de criação: Data e hora, gerada automaticamente.
-- Status: Enum (Pendente, Em andamento, Concluída).
-- Projeto: Referência ao projeto ao qual pertence.
+Ainda logado com seu usuário, você deve ir até a parte de tasks, POST /tasks/. Clicando em Try It Out novamente, deve aparecer uma caixa para editar o JSON.
 
-#### Tag (`Tag`):
+Exemplo:
+{
+  "title": "Criar API Django-Rest",
+  "description": "Criação de uma API Django-Rest para gerenciar projetos e tarefas",
+  "status": "PENDING",
+  "project": 1,
+  "tags": [
+    1
+  ]
+}
 
-- ID: ID gerado automaticamente.
-- Título: Texto.
-- Tarefa: Referência a tarefa ao qual pertence.
+Ao clicar em Execute. Uma nova tarefa deve ser criada.
 
-### 3. Autenticação e Autorização:
+O status de uma tarefa pode ser: "PENDING", "IN_PROGRESS" ou "COMPLETED". Elas estão arranjadas em um ENUM no model.
 
-- Implementar autenticação usando Django Rest Framework com JWT.
-- Garantir que somente usuários autenticados possam acessar os endpoints.
-- Implementar permissões para garantir que somente o criador do projeto possa adicionar ou remover membros.
+O project do JSON deve receber o id do projeto para o qual a tarefa deve ser criada.
 
-### 4. Validações e Erros:
+O tag do JSON deve receber o id da tag para a qual a tarefa deve ser criada.
 
-- Implemente validações para garantir a integridade dos dados.
-- Responda com mensagens de erro claras e status HTTP apropriados.
 
-## 🥇 Diferenciais:
+## Outros Endpoints
 
-- Testes unitários e/ou de integração.
-- Documentação com Swagger ou DRF-YASG.
-- Paginação nos endpoints.
-- Registro de logs.
-- Dockerização da aplicação.
-- Uso de um linter (como Flake8) e formatador de código (como Black).
+GET /tasks/ /projects/ /tags/ /users/
 
-## 🗳️ Instruções de Submissão:
+Trazem uma lista paginada de tarefas, projetos, tags e usuários respectivamente.
 
-1. Faça um fork deste repositório para sua conta pessoal do GitHub.
-2. Commit e push suas mudanças para o seu fork.
-3. Envie um e-mail para [arthur.olga@khipo.com.br] com o link do repositório.
+GET /tasks/{id}/ /projects/{id} /tags/{id} /users/{id}
 
-## 🧪 Avaliação:
+Trazem uma lista paginada de tarefas, projetos, tags e usuários respectivamente pelo id.
 
-- Estrutura do código e organização.
-- Uso adequado das ferramentas e tecnologias.
-- Implementação dos requisitos e regras de negócio.
-- Design e usabilidade.
-- Funcionalidades extras (diferenciais).
+PUT/PATCH /tasks/{id}/ /projects/{id} /tags/{id} /users/{id}
 
-Boa sorte com o desafio! Estamos ansiosos para ver sua solução.
+Atualiza os dados de tarefas, projetos, tags e usuários.
+
+DELETE /tasks/{id}/ /projects/{id} /tags/{id} /users/{id}
+
+Deleta tarefas, projetos, tags e usuários.
